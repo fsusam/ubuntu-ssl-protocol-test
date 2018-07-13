@@ -1,52 +1,29 @@
-# Docker very secured Apache2 with secure SSL (marvambass/apache2-ssl-secure)
-_maintained by MarvAmBass_
+show ciphers
+#openssl ciphers -v | awk '{print $2}' | sort | uniq
 
-[FAQ - All you need to know about the marvambass Containers](https://marvin.im/docker-faq-all-you-need-to-know-about-the-marvambass-containers/)
+create certificate with openssl (reference link https://www.shellhacks.com/create-csr-openssl-without-prompt-non-interactive/)
+#openssl req -nodes -newkey rsa:2048 -keyout /opt/cert/example.key -out /opt/cert/example.csr -subj "/C=GB/ST=Athlone/L=Athlone/O=Global Security/OU=IT Department/CN=example.com"
 
-## What is it
+SSL Protocol
+https://serverfault.com/questions/314858/how-to-enable-tls-1-1-and-1-2-with-openssl-and-apache
 
-This Dockerfile (available as ___marvambass/apache2-ssl-secure___) gives you a ready to use secured production apache2 server, with good configured SSL.
+just support TLSv1.2
+SSLProtocol -all +TLSv1.2
+-all is removing other ssl protocol (SSL 1,2,3 TLS1)
 
-View in Docker Registry [marvambass/apache2-ssl-secure](https://registry.hub.docker.com/u/marvambass/apache2-ssl-secure/)
+just support SSLv2
+SSLProtocol -all SSLv2
 
-View in GitHub [MarvAmBass/docker-apache2-ssl-secure](https://github.com/MarvAmBass/docker-apache2-ssl-secure)
+try openssl client connect
+openssl s_client -connect localhost:443 -ssl3
 
-## Environment variables and defaults
+dockerfile reference
+https://github.com/MarvAmBass/docker-apache2-ssl-secure
 
-* __HSTS\_HEADERS\_ENABLE__
- * default: not set - if set to any value the HTTP Strict Transport Security will be activated on SSL Channel
-* __HSTS\_HEADERS\_ENABLE\_NO\_SUBDOMAINS__
- * default: not set - if set together with __HSTS\_HEADERS\_ENABLE__ and set to any value the HTTP Strict Transport Security will be deactivated on subdomains
+SSL vs. TLS - What's the Difference?
+https://www.globalsign.com/en/blog/ssl-vs-tls-difference/
 
+apt-get install nmap
+nmap --script ssl-enum-ciphers -p 443 localhost
 
-## Running marvambass/apache2-ssl-secure Container
-
-This Dockerfile is not really made for direct usage. It should be used as base-image for your apache2 project. But you can run it anyways.
-
-You should overwrite the _/etc/apache2/external/_ with a folder, containing your apache2 __\*.conf__ files (VirtualHosts etc.), certs and a __dh.pem__.   
-_If you forget the dh.pem file, it will be created at the first start - but this can/will take a long time!_
-
-    docker run -d \
-    -p 80:80 -p 443:443 \
-    -v $EXT_DIR:/etc/apache2/external/ \
-    marvambass/apache2-ssl-secure
-
-## Based on
-
-This Dockerfile is based on the [/_/ubuntu:14.04/](https://registry.hub.docker.com/_/ubuntu/) Official Image.
-
-## Cheat Sheet
-
-### Creating a high secure SSL CSR with openssl
-
-This cert might be incompatible with Windows 2000, XP and older IE Versions
-
-    openssl req -nodes -new -newkey rsa:4096 -out csr.pem -sha256
-
-### Creating a self-signed ssl cert
-
-Please note, that the Common Name (CN) is important and should be the FQDN to the secured server:
-
-    openssl req -x509 -newkey rsa:4086 \
-    -keyout key.pem -out cert.pem \
-    -days 3650 -nodes -sha256
+java -jar certificate-test-jar-with-dependencies 192.168.99.100 443
