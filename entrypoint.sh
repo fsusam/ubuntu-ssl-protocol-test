@@ -54,7 +54,7 @@ if [ ! -e "/etc/apache2/external/cert.pem" ] || [ ! -e "/etc/apache2/external/ke
 then
   echo ">> generating self signed cert"
   openssl req -x509 -newkey rsa:4086 \
-  -subj "/C=XX/ST=XXXX/L=XXXX/O=XXXX/CN=localhost" \
+  -subj "/C=XX/ST=XXXX/L=XXXX/O=XXXX/CN=mock-server" \
   -keyout "/etc/apache2/external/key.pem" \
   -out "/etc/apache2/external/cert.pem" \
   -days 3650 -nodes -sha256

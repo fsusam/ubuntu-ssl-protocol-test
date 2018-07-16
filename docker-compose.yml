@@ -1,0 +1,10 @@
+version: '2.1'
+
+services:
+    mock-server:
+        build: .
+        image: mock-server:v1.0
+        container_name: mock-server
+        ports:
+            - 80:80
+            - 443:443
